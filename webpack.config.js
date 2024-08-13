@@ -7,7 +7,7 @@ module.exports = {
     path: path.resolve(__dirname, 'build'),
     filename: 'bundle.js',
     clean: true,
-    publicPath: '/', 
+    publicPath: '/calculator-app/', 
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
