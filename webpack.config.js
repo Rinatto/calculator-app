@@ -4,10 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
   entry: './src/index.tsx',
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: path.resolve(__dirname, 'docs'),
     filename: 'bundle.js',
     clean: true,
-    publicPath: '/calculator-app/', 
+    publicPath: '/', 
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
@@ -36,7 +36,7 @@ module.exports = {
     }),
   ],
   devServer: {
-    static: path.join(__dirname, 'dist'),
+    static: path.join(__dirname, 'src'),
     compress: true,
     port: 9000,
     historyApiFallback: true,
