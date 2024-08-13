@@ -1,7 +1,6 @@
 {
   "name": "test-calc",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
     "start": "webpack serve --open",
     "lint": "eslint .",
