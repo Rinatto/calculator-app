@@ -10,6 +10,7 @@ import "../styles/Calculator.css";
 export const Calculator: React.FC = () => {
   const [input, setInput] = useState<string>("");
   const [result, setResult] = useState<string>("");
+  const [lastExpression, setLastExpression] = useState<string>("");
 
   const handleCalculate = useCallback(() => {
     try {
@@ -25,21 +26,43 @@ export const Calculator: React.FC = () => {
       }
 
       setResult(computedResult.toString());
+      setLastExpression(normalizedInput);
     } catch {
       setResult("Error");
     }
   }, [input]);
 
+  const handleRepeatLastOperation = useCallback(() => {
+    if (lastExpression) {
+      const lastOperatorIndex = Math.max(
+        lastExpression.lastIndexOf("+"),
+        lastExpression.lastIndexOf("-"),
+        lastExpression.lastIndexOf("×"),
+        lastExpression.lastIndexOf("/"),
+        lastExpression.lastIndexOf("%"),
+      );
+      const repeatedExpression = `${result}${lastExpression.slice(lastOperatorIndex)}`;
+      const newResult = evaluateExpression(repeatedExpression);
+      setInput(repeatedExpression);
+      setResult(newResult.toString());
+    }
+  }, [result, lastExpression]);
+
   const handleClear = useCallback(() => {
     setInput("");
     setResult("");
+    setLastExpression("");
   }, []);
 
   const handleClick = (value: string) => {
     if (value === "C") {
       handleClear();
     } else if (value === "=") {
-      handleCalculate();
+      if (input && !result) {
+        handleCalculate();
+      } else {
+        handleRepeatLastOperation();
+      }
     } else if (["+", "-", "×", "/", "%"].includes(value)) {
       if (result !== "") {
         setInput(result + value);
@@ -55,13 +78,12 @@ export const Calculator: React.FC = () => {
   };
 
   useEffect(() => {
-    let calculationPerformed = false;
-
     const handleGlobalKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Enter") {
-        if (!calculationPerformed) {
+        if (input && !result) {
           handleCalculate();
-          calculationPerformed = true;
+        } else {
+          handleRepeatLastOperation();
         }
       } else if (event.key === "Escape") {
         handleClear();
@@ -69,7 +91,6 @@ export const Calculator: React.FC = () => {
         event.preventDefault();
         setInput((prev) => prev.slice(0, -1));
       } else {
-        calculationPerformed = false;
         if (
           [
             "0",
@@ -114,7 +135,7 @@ export const Calculator: React.FC = () => {
     return () => {
       document.removeEventListener("keydown", handleGlobalKeyDown);
     };
-  }, [handleCalculate, handleClear]);
+  }, [handleCalculate, handleClear, handleRepeatLastOperation]);
 
   const fontSize =
     result.length > 10 ? `${30 - (result.length - 10)}px` : "2.5em";

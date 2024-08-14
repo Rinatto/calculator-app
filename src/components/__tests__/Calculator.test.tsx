@@ -147,4 +147,18 @@ describe("Calculator", () => {
     const resultDisplay = screen.getByTestId("result");
     expect(resultDisplay).toHaveTextContent("10");
   });
+
+  test("repeats the last operation correctly", () => {
+    render(<Calculator />);
+
+    fireEvent.click(screen.getByText("4"));
+    fireEvent.click(screen.getByText("+"));
+    fireEvent.click(screen.getByText("4"));
+    fireEvent.click(screen.getByText("="));
+
+    fireEvent.click(screen.getByText("="));
+
+    const resultDisplay = screen.getByTestId("result");
+    expect(resultDisplay).toHaveTextContent("12");
+  });
 });
