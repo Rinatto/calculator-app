@@ -36,7 +36,7 @@ module.exports = {
     }),
   ],
   devServer: {
-    static: path.join(__dirname, 'src'),
+    static: path.join(__dirname, 'docs'),
     compress: true,
     port: 9000,
     historyApiFallback: true,

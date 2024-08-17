@@ -161,4 +161,17 @@ describe("Calculator", () => {
     const resultDisplay = screen.getByTestId("result");
     expect(resultDisplay).toHaveTextContent("12");
   });
+
+  test("handles negative numbers correctly", () => {
+    render(<Calculator />);
+
+    fireEvent.click(screen.getByText("-"));
+    fireEvent.click(screen.getByText("5"));
+    fireEvent.click(screen.getByText("-"));
+    fireEvent.click(screen.getByText("3"));
+    fireEvent.click(screen.getByText("="));
+
+    const resultDisplay = screen.getByTestId("result");
+    expect(resultDisplay).toHaveTextContent("-8");
+  });
 });

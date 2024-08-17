@@ -12,13 +12,32 @@ export const Calculator: React.FC = () => {
   const [result, setResult] = useState<string>("");
   const [lastExpression, setLastExpression] = useState<string>("");
 
+  const buttons = [
+    "C",
+    "√",
+    "%",
+    "/",
+    "7",
+    "8",
+    "9",
+    "×",
+    "4",
+    "5",
+    "6",
+    "-",
+    "1",
+    "2",
+    "3",
+    "+",
+    "00",
+    "0",
+    ",",
+    "=",
+  ];
+
   const handleCalculate = useCallback(() => {
     try {
       const normalizedInput = input.replace(/×/g, "*").replace(/,/g, ".");
-      if (!normalizedInput || /[^0-9+*/%√().,-]/.test(normalizedInput)) {
-        throw new Error("Invalid Expression");
-      }
-
       const computedResult = evaluateExpression(normalizedInput);
 
       if (isNaN(Number(computedResult))) {
@@ -37,7 +56,7 @@ export const Calculator: React.FC = () => {
       const lastOperatorIndex = Math.max(
         lastExpression.lastIndexOf("+"),
         lastExpression.lastIndexOf("-"),
-        lastExpression.lastIndexOf("×"),
+        lastExpression.lastIndexOf("*"),
         lastExpression.lastIndexOf("/"),
         lastExpression.lastIndexOf("%"),
       );
@@ -67,6 +86,8 @@ export const Calculator: React.FC = () => {
       if (result !== "") {
         setInput(result + value);
         setResult("");
+      } else if (value === "-" && input === "") {
+        setInput(value);
       } else {
         setInput(input + value);
       }
@@ -90,44 +111,11 @@ export const Calculator: React.FC = () => {
       } else if (event.key === "Backspace") {
         event.preventDefault();
         setInput((prev) => prev.slice(0, -1));
-      } else {
-        if (
-          [
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "+",
-            "-",
-            "*",
-            "/",
-            "(",
-            ")",
-            ".",
-            "%",
-            "√",
-          ].includes(event.key)
-        ) {
-          event.preventDefault();
-          let value = event.key;
-          switch (event.key) {
-            case "*":
-              value = "×";
-              break;
-            case ".":
-              value = ",";
-              break;
-            default:
-              break;
-          }
-          setInput((prev) => prev + value);
-        }
+      } else if (buttons.includes(event.key) || event.key === "*") {
+        event.preventDefault();
+        let value =
+          event.key === "*" ? "×" : event.key === "." ? "," : event.key;
+        setInput((prev) => prev + value);
       }
     };
 
@@ -135,7 +123,14 @@ export const Calculator: React.FC = () => {
     return () => {
       document.removeEventListener("keydown", handleGlobalKeyDown);
     };
-  }, [handleCalculate, handleClear, handleRepeatLastOperation]);
+  }, [
+    handleCalculate,
+    handleClear,
+    handleRepeatLastOperation,
+    input,
+    result,
+    buttons,
+  ]);
 
   const fontSize =
     result.length > 10 ? `${30 - (result.length - 10)}px` : "2.5em";
@@ -144,7 +139,7 @@ export const Calculator: React.FC = () => {
     <div className="calculator-container">
       <DisplayComponent input={input} result={result} fontSize={fontSize} />
       <hr className="calculator-line" />
-      <ButtonPanel onClick={handleClick} />
+      <ButtonPanel onClick={handleClick} buttons={buttons} />{" "}
     </div>
   );
 };

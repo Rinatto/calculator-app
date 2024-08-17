@@ -1,3 +1,11 @@
+import {
+  add,
+  divide,
+  multiply,
+  percentage,
+  sqrt,
+  subtract,
+} from "./mathOperations";
 import { parseExpression } from "./parser";
 
 function getPrecedence(operator: string): number {
@@ -18,20 +26,17 @@ function getPrecedence(operator: string): number {
 function applyOperator(operator: string, b: number, a: number): number {
   switch (operator) {
     case "+":
-      return a + b;
+      return add(a, b);
     case "-":
-      return a - b;
+      return subtract(a, b);
     case "*":
-      return a * b;
+      return multiply(a, b);
     case "/":
-      if (b === 0) {
-        throw new Error("Division by zero");
-      }
-      return a / b;
+      return divide(a, b);
     case "√":
-      return Math.sqrt(b);
+      return sqrt(b);
     case "%":
-      return (a * b) / 100;
+      return percentage(a, b);
     default:
       throw new Error(`Unknown operator: ${operator}`);
   }
@@ -42,20 +47,25 @@ export function evaluateExpression(expression: string): number {
   const outputQueue: string[] = [];
   const operatorStack: string[] = [];
 
-  tokens.forEach((token) => {
+  tokens.forEach((token, index) => {
     if (!isNaN(parseFloat(token))) {
-      // Если токен - число
       outputQueue.push(token);
     } else if ("+-*/√%".includes(token)) {
-      // Если токен - оператор
-      while (
-        operatorStack.length > 0 &&
-        getPrecedence(operatorStack[operatorStack.length - 1]) >=
-          getPrecedence(token)
-      ) {
-        outputQueue.push(operatorStack.pop() as string);
+      const isUnaryMinus =
+        token === "-" && (index === 0 || "*/+-(".includes(tokens[index - 1]));
+      if (isUnaryMinus) {
+        outputQueue.push("-1");
+        operatorStack.push("*");
+      } else {
+        while (
+          operatorStack.length > 0 &&
+          getPrecedence(operatorStack[operatorStack.length - 1]) >=
+            getPrecedence(token)
+        ) {
+          outputQueue.push(operatorStack.pop() as string);
+        }
+        operatorStack.push(token);
       }
-      operatorStack.push(token);
     } else if (token === "(") {
       operatorStack.push(token);
     } else if (token === ")") {
@@ -65,26 +75,22 @@ export function evaluateExpression(expression: string): number {
       ) {
         outputQueue.push(operatorStack.pop() as string);
       }
-      operatorStack.pop(); // Удаляем '('
+      operatorStack.pop();
     }
   });
 
-  // Очищаем операторный стек
   while (operatorStack.length > 0) {
     outputQueue.push(operatorStack.pop() as string);
   }
 
-  // Вычисляем результат из постфиксной записи
   const resultStack: number[] = [];
 
   outputQueue.forEach((token) => {
     if (!isNaN(parseFloat(token))) {
-      // Если токен - число
       resultStack.push(parseFloat(token));
     } else {
-      // Если токен - оператор
       const b = resultStack.pop() as number;
-      const a = resultStack.pop() as number;
+      const a = (resultStack.pop() as number) || 0;
       const result = applyOperator(token, b, a);
       resultStack.push(result);
     }
