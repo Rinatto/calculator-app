@@ -53,15 +53,29 @@ export const Calculator: React.FC = () => {
 
   const handleRepeatLastOperation = useCallback(() => {
     if (lastExpression) {
+      // Находим последний оператор и его операнд
       const lastOperatorIndex = Math.max(
         lastExpression.lastIndexOf("+"),
         lastExpression.lastIndexOf("-"),
         lastExpression.lastIndexOf("*"),
         lastExpression.lastIndexOf("/"),
-        lastExpression.lastIndexOf("%"),
       );
-      const repeatedExpression = `${result}${lastExpression.slice(lastOperatorIndex)}`;
+
+      const lastOperator = lastExpression.slice(
+        lastOperatorIndex,
+        lastOperatorIndex + 1,
+      );
+      let lastOperand = lastExpression.slice(lastOperatorIndex + 1);
+
+      if (lastOperand.startsWith("(") && lastOperand.endsWith(")")) {
+        lastOperand = lastOperand.slice(1, -1);
+      } else if (lastOperand.endsWith(")")) {
+        lastOperand = lastOperand.slice(0, -1);
+      }
+
+      const repeatedExpression = `${result}${lastOperator}${lastOperand}`;
       const newResult = evaluateExpression(repeatedExpression);
+
       setInput(repeatedExpression);
       setResult(newResult.toString());
     }
