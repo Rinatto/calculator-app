@@ -111,7 +111,29 @@ export const Calculator: React.FC = () => {
       } else if (event.key === "Backspace") {
         event.preventDefault();
         setInput((prev) => prev.slice(0, -1));
-      } else if (buttons.includes(event.key) || event.key === "*") {
+      } else if (
+        [
+          "(",
+          ")",
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+          "+",
+          "-",
+          "*",
+          "/",
+          ".",
+          "%",
+          "√",
+        ].includes(event.key)
+      ) {
         event.preventDefault();
         let value =
           event.key === "*" ? "×" : event.key === "." ? "," : event.key;

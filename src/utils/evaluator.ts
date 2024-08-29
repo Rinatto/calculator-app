@@ -8,6 +8,10 @@ import {
 } from "./mathOperations";
 import { parseExpression } from "./parser";
 
+function roundResult(value: number, decimals: number = 10): number {
+  return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+}
+
 function getPrecedence(operator: string): number {
   switch (operator) {
     case "+":
@@ -24,22 +28,30 @@ function getPrecedence(operator: string): number {
 }
 
 function applyOperator(operator: string, b: number, a: number): number {
+  let result;
   switch (operator) {
     case "+":
-      return add(a, b);
+      result = add(a, b);
+      break;
     case "-":
-      return subtract(a, b);
+      result = subtract(a, b);
+      break;
     case "*":
-      return multiply(a, b);
+      result = multiply(a, b);
+      break;
     case "/":
-      return divide(a, b);
+      result = divide(a, b);
+      break;
     case "√":
-      return sqrt(b);
+      result = sqrt(b);
+      break;
     case "%":
-      return percentage(a, b);
+      result = percentage(a, b);
+      break;
     default:
       throw new Error(`Unknown operator: ${operator}`);
   }
+  return roundResult(result);
 }
 
 export function evaluateExpression(expression: string): number {
